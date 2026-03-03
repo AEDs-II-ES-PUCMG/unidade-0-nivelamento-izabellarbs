@@ -58,9 +58,28 @@ public class Comercio {
      * @return Um vetor com os produtos carregados, ou vazio em caso de problemas de leitura.
      */
     static Produto[] lerProdutos(String nomeArquivoDados) {
-        Produto[] vetorProdutos;
-        //TO DO
-        return vetorProdutos;
+        Scanner arquivo = null;
+        int i, numProdutos;
+        String linha;
+        Produto produto;
+        Produto[] produtosCadastrados = new Produto[MAX_NOVOS_PRODUTOS];
+
+        try {
+            arquivo = new Scanner (new File (nomeArquivoDados), Charset.forName("UTF-8"));
+            numProdutos = Integer.parseInt(arquivo.nextLine());
+            for (i=0; (i<numProdutos && i<MAX_NOVOS_PRODUTOS); i++){
+                linha = arquivo.nextLine();
+                produto = Produto.criarDoTexto(linha);
+                produtosCadastrados[i] = produto;
+            }
+            quantosProdutos = 1;
+        } catch (IOException excecaoArquivo) {
+            produtosCadastrados = null;
+        } finally{
+            arquivo.close();
+        }
+
+        return produtosCadastrados;
     }
 
     /** Lista todos os produtos cadastrados, numerados, um por linha */

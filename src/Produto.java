@@ -1,9 +1,11 @@
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
-public class Produto {
+public abstract class Produto {
 
 	private static final double MARGEM_PADRAO = 0.2;
-	private String descricao;
+	protected String descricao;
 	protected double precoCusto;
 	protected double margemLucro;
 
@@ -88,12 +90,27 @@ public class Produto {
 		return this.descricao.toLowerCase().equals(outro.descricao.toLowerCase());
 	}
 
-	/**
-	 * Gera uma linha de texto a partir dos dados do produto
-	 * 
-	 * @return Uma string no formato "tipo;
-	 *         descrição;preçoDeCusto;margemDeLucro;[dataDeValidade]"
-	 */
+	static Produto criarDoTexto (String linha){
+		Produto novoProduto = null;
+		DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String[] atributos = linha.split(";");
+		int tipo = Integer.parseInt(atributos[0]);
+		String descricao = atributos[1];
+		double preco = Double.parseDouble(atributos[2]);
+		double margem = Double.parseDouble(atributos[3]);
+		if (tipo==1){
+			novoProduto = new ProdutoNaoPerecivel(descricao, preco, margem);
+		}
+		else {
+			LocalDate datavalidade = LocalDate.parse(atributos[4], formatoData);
+			novoProduto = new ProdutoPerecivel(descricao, preco, margem, datavalidade);
+		}
+		return novoProduto;
+	}
+
 	public abstract String gerarDadosTexto();
+	
+
+	
 
 }
