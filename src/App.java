@@ -58,32 +58,40 @@ public class App {
      * @return Um vetor com os produtos carregados, ou vazio em caso de problemas de leitura.
      */
     static Produto[] lerProdutos(String nomeArquivoDados) {
-        Produto[] produtosCadastrados = new Produto[MAX_NOVOS_PRODUTOS];
+        Produto[] vetorProdutos = null;
         Scanner arquivo = null;
         String linha;
         int numProdutos;
         Produto produto;
         int i;
 
-        try{
+        try {
             arquivo = new Scanner(new File(nomeArquivoDados), Charset.forName("UTF-8"));
+            
+            // Lê a quantidade de produtos já existentes no arquivo
             numProdutos = Integer.parseInt(arquivo.nextLine());
-            for (i=0; (i<numProdutos && i<MAX_NOVOS_PRODUTOS); i++) {
+            
+            // Instancia o vetor com o tamanho dos produtos do arquivo + espaço reserva
+            vetorProdutos = new Produto[numProdutos + MAX_NOVOS_PRODUTOS];
+            
+            for (i = 0; i < numProdutos; i++) {
                 linha = arquivo.nextLine();
                 produto = Produto.criarDoTexto(linha);
-                produtosCadastrados[i] = produto;
+                vetorProdutos[i] = produto;
             }
             quantosProdutos = i;
-        }
-        catch (IOException excecaoArquivo){ 
+            
+        } catch (IOException excecaoArquivo) { 
             System.out.println("Erro ao ler arquivo de produtos.");
+            // Fallback seguro caso o arquivo não exista na primeira execução
+            vetorProdutos = new Produto[MAX_NOVOS_PRODUTOS]; 
             quantosProdutos = 0;
-        }finally{
-            if(arquivo != null){
+        } finally {
+            if (arquivo != null) {
                 arquivo.close();
             }
         }
-        return produtosCadastrados;
+        return vetorProdutos;
     }
 
     /** Lista todos os produtos cadastrados, numerados, um por linha */
@@ -97,22 +105,28 @@ public class App {
     }
 
     /** Localiza um produto no vetor de cadastrados, a partir do nome, e imprime seus dados. 
-     *  A busca não é sensível ao caso.  Em caso de não encontrar o produto, imprime mensagem padrão */
+     * A busca não é sensível ao caso. Em caso de não encontrar o produto, imprime mensagem padrão */
     static void localizarProdutos(){
         int prod = -1;
         cabecalho();
         System.out.println("\nDigite o nome do produto que você gostaria de procurar: ");
 
         String nome = teclado.nextLine();
+        
+        // Cria um produto auxiliar apenas para podermos usar o método equals()
+        Produto produtoBusca = new ProdutoNaoPerecivel(nome, 1.0);
+
         for (int i = 0; i < quantosProdutos; i++) {
-            if(produtosCadastrados[i].toString().toLowerCase().contains(nome.toLowerCase())){
+            // Utiliza o equals() implementado na classe Produto
+            if(produtosCadastrados[i].equals(produtoBusca)){
                 prod = i;
+                break; // Encontrou, pode interromper o laço
             }
-                
         }
+        
         if (prod != -1) {
-            System.out.println(String.format("%02d - %s", (prod+1),produtosCadastrados[prod].toString()));
-        }else{
+            System.out.println(String.format("%02d - %s", (prod+1), produtosCadastrados[prod].toString()));
+        } else {
             System.out.println("Produto não encontrado!");
         }
     }
