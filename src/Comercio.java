@@ -62,24 +62,33 @@ public class Comercio {
         int i, numProdutos;
         String linha;
         Produto produto;
-        Produto[] produtosCadastrados = new Produto[MAX_NOVOS_PRODUTOS];
+        Produto[] vetorProdutos = null;
 
         try {
-            arquivo = new Scanner (new File (nomeArquivoDados), Charset.forName("UTF-8"));
+            arquivo = new Scanner(new File(nomeArquivoDados), Charset.forName("UTF-8"));
             numProdutos = Integer.parseInt(arquivo.nextLine());
-            for (i=0; (i<numProdutos && i<MAX_NOVOS_PRODUTOS); i++){
+            
+            // Instancia o vetor com o tamanho dinâmico (produtos do arquivo + reserva)
+            vetorProdutos = new Produto[numProdutos + MAX_NOVOS_PRODUTOS];
+            
+            for (i = 0; i < numProdutos; i++){
                 linha = arquivo.nextLine();
                 produto = Produto.criarDoTexto(linha);
-                produtosCadastrados[i] = produto;
+                vetorProdutos[i] = produto;
             }
-            quantosProdutos = 1;
+            // Atualiza a variável global com a quantidade correta que acabou de ser lida
+            quantosProdutos = numProdutos;
         } catch (IOException excecaoArquivo) {
-            produtosCadastrados = null;
+            // Se falhar (arquivo não existe, por ex), cria um vetor vazio apenas com a margem
+            vetorProdutos = new Produto[MAX_NOVOS_PRODUTOS];
+            quantosProdutos = 0;
         } finally{
-            arquivo.close();
+            if (arquivo != null) {
+                arquivo.close();
+            }
         }
 
-        return produtosCadastrados;
+        return vetorProdutos;
     }
 
     /** Lista todos os produtos cadastrados, numerados, um por linha */
@@ -127,8 +136,49 @@ public class Comercio {
      * Uma sugestão de melhoria mais significativa poderia ser o uso de padrão Factory Method para criação dos objetos.
      */
     static void cadastrarProduto(){
-        //TO DO
+        cabecalho();
+        System.out.println("CADASTRAR NOVO PRODUTO");
+
+        // Verifica se ainda há espaço no vetor
+        if (quantosProdutos >= produtosCadastrados.length) {
+            System.out.println("Limite de produtos cadastrados atingido.");
+            return;
+        }
+
+        System.out.print("Qual o tipo do produto? (1 - Não Perecível, 2 - Perecível): ");
+        int tipo = Integer.parseInt(teclado.nextLine());
+
+        System.out.print("Descrição: ");
+        String descricao = teclado.nextLine();
+
+        System.out.print("Preço de Custo (ex: 15.50): ");
+        double precoCusto = Double.parseDouble(teclado.nextLine().replace(",", "."));
+
+        System.out.print("Margem de Lucro (ex: 0.2 para 20%): ");
+        double margemLucro = Double.parseDouble(teclado.nextLine().replace(",", "."));
+
+        Produto novoProduto = null;
+
+        if (tipo == 1) {
+            novoProduto = new ProdutoNaoPerecivel(descricao, precoCusto, margemLucro);
+        } else if (tipo == 2) {
+            System.out.print("Data de Validade (dd/MM/yyyy): ");
+            String dataStr = teclado.nextLine();
+            DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate dataValidade = LocalDate.parse(dataStr, formatoData);
+            
+            novoProduto = new ProdutoPerecivel(descricao, precoCusto, margemLucro, dataValidade);
+        } else {
+            System.out.println("Tipo inválido. Operação cancelada.");
+            return;
+        }
+
+        // Salva no vetor e incrementa o contador
+        produtosCadastrados[quantosProdutos] = novoProduto;
+        quantosProdutos++;
+        System.out.println("Produto cadastrado com sucesso!");
     }
+    
 
     /**
      * Salva os dados dos produtos cadastrados no arquivo csv informado. Sobrescreve todo o conteúdo do arquivo.
