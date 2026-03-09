@@ -72,9 +72,10 @@ public class App {
             numProdutos = Integer.parseInt(arquivo.nextLine());
             
             // Instancia o vetor com o tamanho dos produtos do arquivo + espaço reserva
-            vetorProdutos = new Produto[numProdutos + MAX_NOVOS_PRODUTOS];
+          //  vetorProdutos = new Produto[numProdutos + MAX_NOVOS_PRODUTOS];
             
-            for (i = 0; i < numProdutos; i++) {
+            //for (i = 0; i < numProdutos; i++) {
+            for (i=0; (i<numProdutos && i<MAX_NOVOS_PRODUTOS); i++) {
                 linha = arquivo.nextLine();
                 produto = Produto.criarDoTexto(linha);
                 vetorProdutos[i] = produto;
@@ -84,14 +85,15 @@ public class App {
         } catch (IOException excecaoArquivo) { 
             System.out.println("Erro ao ler arquivo de produtos.");
             // Fallback seguro caso o arquivo não exista na primeira execução
-            vetorProdutos = new Produto[MAX_NOVOS_PRODUTOS]; 
+            //vetorProdutos = new Produto[MAX_NOVOS_PRODUTOS]; 
             quantosProdutos = 0;
         } finally {
             if (arquivo != null) {
                 arquivo.close();
             }
         }
-        return vetorProdutos;
+        //return vetorProdutos;
+        return produtosCadastrados;
     }
 
     /** Lista todos os produtos cadastrados, numerados, um por linha */
@@ -114,13 +116,13 @@ public class App {
         String nome = teclado.nextLine();
         
         // Cria um produto auxiliar apenas para podermos usar o método equals()
-        Produto produtoBusca = new ProdutoNaoPerecivel(nome, 1.0);
+        //Produto produtoBusca = new ProdutoNaoPerecivel(nome, 1.0);
 
         for (int i = 0; i < quantosProdutos; i++) {
             // Utiliza o equals() implementado na classe Produto
-            if(produtosCadastrados[i].equals(produtoBusca)){
+            if(produtosCadastrados[i].toString().toLowerCase().contains(nome.toLowerCase())){
                 prod = i;
-                break; // Encontrou, pode interromper o laço
+
             }
         }
         
