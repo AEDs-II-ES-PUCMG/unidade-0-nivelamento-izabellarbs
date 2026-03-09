@@ -95,7 +95,29 @@ public class Comercio {
     /** Localiza um produto no vetor de cadastrados, a partir do nome, e imprime seus dados. 
      *  A busca não é sensível ao caso.  Em caso de não encontrar o produto, imprime mensagem padrão */
     static void localizarProdutos(){
-        //TO DO
+        String descricao;
+        ProdutoNaoPerecivel produtoALocalizar;
+        Produto produto = null;
+        Boolean localizado = false;
+        
+        cabecalho ();
+        System.out.println("Informe a descrição do produto desejado:");
+        descricao = teclado.nextLine();
+        produtoALocalizar = new ProdutoNaoPerecivel(descricao, 0.01);
+
+        for (int i=0; (i<quantosProdutos && !localizado); i++){
+            if (produtosCadastrados[i].equals(produtoALocalizar)){
+                produto = produtosCadastrados[i];
+                localizado = true;
+            }
+        }
+        if (!localizado){
+            System.out.println("Produto não encontrado.");
+        } else {
+            System.out.println("Produto encontrado:");
+            System.out.println(produto.toString());
+        }
+
     }
 
     /**
@@ -113,7 +135,20 @@ public class Comercio {
      * @param nomeArquivo Nome do arquivo a ser gravado.
      */
     public static void salvarProdutos(String nomeArquivo){
-        //TO DO  
+        FileWriter arquivo = null;
+        try {
+            arquivo = new FileWriter(nomeArquivo, Charset.forName("UTF-8"));
+            arquivo.append(quantosProdutos + "\n");
+
+            for (int i=0; i<quantosProdutos; i++){
+                arquivo.append(produtosCadastrados[i].gerarDadosTexto() + "\n");
+            }
+
+            arquivo.close();
+            System.out.println("Arquivo" + nomeArquivo + " salvo com sucesso.");
+        } catch (IOException e) {
+            System.out.println("Problemas no arquivo" + nomeArquivo + ". Tente novamente.");
+        } 
     }
 
     public static void main(String[] args) throws Exception {
