@@ -10,14 +10,20 @@ public class ProdutoNaoPerecivel extends Produto {
     }
     
     @Override
-    public double valorDeVenda () {
+    public double valorDeVenda() {
         return (precoCusto * (1.0 + margemLucro));
     }
 
-    @Override
-    public String gerarDadosTexto(){
+
+     @Override
+    public String gerarDadosTexto() {
         String precoFormatado = String.format("%.2f", precoCusto).replace(",", ".");
         String margemFormatada = String.format("%.2f", margemLucro).replace(",", ".");
+        if (quantEstoque > 0) {
+            return String.format("1;%s;%s;%s;%d", descricao, precoFormatado, margemFormatada, quantEstoque);
+        }
         return String.format("1;%s;%s;%s", descricao, precoFormatado, margemFormatada);
     }
+     
+
 }

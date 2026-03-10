@@ -8,6 +8,7 @@ public abstract class Produto {
 	protected String descricao;
 	protected double precoCusto;
 	protected double margemLucro;
+	protected double quantEstoque;
 
 	/**
 	 * Inicializador privado. Os valores default, em caso de erro, são:
@@ -77,6 +78,12 @@ public abstract class Produto {
 		return String.format("NOME: " + descricao + ": " + moeda.format(valorDeVenda()));
 	}
 
+
+	public void baixarEstoque(int quantidade) {
+		if (quantidade > 0 && quantidade <= quantEstoque) {
+			quantEstoque -= quantidade;
+		}
+	}
 	/**
 	 * Igualdade de produtos: caso possuam o mesmo nome/descrição.
 	 * 
@@ -100,16 +107,25 @@ public abstract class Produto {
 		double margem = Double.parseDouble(atributos[3]);
 		if (tipo==1){
 			novoProduto = new ProdutoNaoPerecivel(descricao, preco, margem);
+			if(atributos.length > 4) {
+				novoProduto.quantEstoque = Integer.parseInt(atributos[4]);
+			}
 		}
 		else {
-			LocalDate datavalidade = LocalDate.parse(atributos[4], formatoData);
-			novoProduto = new ProdutoPerecivel(descricao, preco, margem, datavalidade);
+			if (atributos.length > 5) {
+				novoProduto = new ProdutoPerecivel(descricao, preco, margem, LocalDate.parse(atributos[5], formatoData));
+			novoProduto.quantEstoque = Integer.parseInt(atributos[4]);
+			} else {
+				novoProduto = new ProdutoPerecivel(descricao, preco, margem, LocalDate.parse(atributos[4], formatoData));
+			}
 		}
 		return novoProduto;
 	}
 
+
 	public abstract String gerarDadosTexto();
-	
+
+    protected abstract Object getProduto();
 
 	
 

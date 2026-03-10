@@ -46,4 +46,7 @@ public class ProdutoPerecivel extends Produto{
         String dataFormatada = formato.format(dataDeValidade);
         return String.format("2;%s;%s;%s;%s", descricao, precoFormatado, margemFormatada, dataFormatada);
     }
+
+
+    
 }
